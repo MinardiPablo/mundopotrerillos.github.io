@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Excursiones</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+
+<body>
+
+    <!-- Video Fondo de pantalla -->
+    <video muted autoplay loop>
+        <source src="imagenes/Inicio.mp4" type="video/mp4">
+    </video>
+
+    <div class="capa"></div>
+
+    <div class="titulo"><h2>Agregá una excursión</h2></div>
+
+    <!--enctype="multipart/form-data" es necesario para enviar archivos al back.-->
+    <form id="formulario" enctype="multipart/form-data">
+        <label for="num_excursion">N° Excursión:</label>
+        <input type="text" id="num_excursion" name="num_excursion" required><br>
+
+        <label for="nombre_excursion">Nombre Excursión:</label>
+        <input type="text" id="nombre_excursion" name="nombre_excursion" required><br>
+
+        <label for="cantidad_personas">Cantidad de personas:</label>
+        <input type="number" id="cantidad_personas" name="cantidad_personas" required><br>
+
+        <label for="precio">Precio:</label>
+        <input type="number" step="0.01" id="precio" name="precio" required><br>
+
+        <label for="imagenProducto">Imagen de la excursión:</label>
+        <input type="file" id="imagenProducto" name="imagen">
+
+        <br><br>
+        <label for="num_agenciaProducto">N° Agencia de viajes:</label>
+        <input type="text" id="num_agenciaProducto" name="num_agencia">
+        
+        <button type="submit">Agregar Excursión</button>
+        <a href="listadoEliminar.html">Mis Excursiones</a>
+    </form>
+
+    <script>
+        //const URL = "http://127.0.0.1:5000/"
+
+        //Al subir al servidor, deberá utilizarse la siguiente ruta. USUARIO debe ser reemplazado por el nombre de usuario de Pythonanywhere
+        const URL = "https://pablominardi.pythonanywhere.com/"
+        
+
+        // Capturamos el evento de envío del formulario
+        document.getElementById('formulario').addEventListener('submit', function (event) {
+            event.preventDefault(); // Evitamos que se envie el form 
+
+            var formData = new FormData();
+            formData.append('num_excursion', document.getElementById('num_excursion').value);
+            formData.append('nombre_excursion', document.getElementById('nombre_excursion').value);
+            formData.append('cantidad_personas', document.getElementById('cantidad_personas').value);
+            formData.append('precio', document.getElementById('precio').value);
+            formData.append('imagen', document.getElementById('imagenProducto').files[0]);
+            formData.append('num_agencia', document.getElementById('num_agenciaProducto').value);
+            
+            // Realizamos la solicitud POST al servidor. El método POST se usa para enviar y crear nuevos datos en el servidor.
+            fetch(URL + 'productos', {
+                method: 'POST',
+                body: formData // Aquí enviamos formData. Dado que formData puede contener archivos, no se utiliza JSON.
+            })
+
+                //Después de realizar la solicitud POST, se utiliza el método then() para manejar la respuesta del servidor.
+                .then(function (response) {
+                    if (response.ok) { 
+                        //Si la respuesta es exitosa, convierte los datos de la respuesta a formato JSON.
+                        return response.json(); 
+                    } else {
+                        // Si hubo un error, lanzar explícitamente una excepción
+                        // para ser "catcheada" más adelante
+                        throw new Error('Error al agregar el producto.');
+                    }
+                })
+
+                //Respuesta OK, muestra una alerta informando que el producto se agregó correctamente y limpia los campos del formulario para que puedan ser utilizados para un nuevo producto.
+                .then(function (data) {
+                    alert('Producto agregado correctamente.');
+                })
+
+                // En caso de error, mostramos una alerta con un mensaje de error.
+                .catch(function (error) {
+                    alert('Error al agregar el producto.');
+                })
+
+                // Limpiar el formulario en ambos casos (éxito o error)
+                .finally(function () {
+                    document.getElementById('num_excursion').value = "";
+                    document.getElementById('nombre_excursion').value = "";
+                    document.getElementById('cantidad_personas').value = "";
+                    document.getElementById('precio').value = "";
+                    document.getElementById('imagenProducto').value = "";
+                    document.getElementById('num_agenciaProducto').value = "";
+                });
+        })
+    </script>
+</body>
+
+</html>
